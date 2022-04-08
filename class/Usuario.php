@@ -134,6 +134,19 @@ class Usuario{
 
     }
 
+    public function delete(){
+        $sql = new Sql();
+        $sql->query("DELETE FROM tb_usuarios where idUsuario = :ID", array(
+           ':ID'=>$this->getIdUsuario()
+        ));
+
+        $this->setIdUsuario(0);
+        $this->setLogin("");
+        $this->setSenha("");
+        $this->setDtCadastro(new DateTime());
+
+    }
+
 }
 
 

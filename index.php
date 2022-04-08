@@ -47,11 +47,21 @@ echo $jiban;
 */
 
 
+/*
+//update com DAO
 $usuario = new Usuario();
 
 $usuario->loadById(5);
 
 $usuario->update("LionMan", "L10nM4n");
+
+echo $usuario;
+
+*/
+
+$usuario = new Usuario();
+$usuario->loadById(6);
+$usuario->delete();
 
 echo $usuario;
 
