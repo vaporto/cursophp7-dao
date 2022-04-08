@@ -6,6 +6,11 @@ class Usuario{
     private $senha;
     private $dtCadastro;
 
+    public function __construct($login ="", $senha=""){
+        $this->setLogin($login);
+        $this->setSenha($senha);
+    }
+
     public function getIdUsuario(){
         return $this->idUsuario;
     }
@@ -44,12 +49,7 @@ class Usuario{
          ":ID"=>$id   
         ));
         if(count($results) > 0){
-            $row = $results[0];
-
-            $this->setIdUsuario($row["idUsuario"]);
-            $this->setLogin($row["login"]);
-            $this->setSenha($row["senha"]);
-            $this->setDtCadastro(new DateTime($row["dtCadastro"]));
+            $this->setData($results[0]);
         }
 
     }
@@ -64,11 +64,77 @@ class Usuario{
         ));
     }
 
+    public static function getList(){
+        $sql = new Sql();
+    
+        return $sql->select("SELECT * FROM tb_usuarios ORDER BY login;");
+    }
 
 
+    public static function search($login){
+        $sql = new Sql();
+
+        return $sql->select("SELECT * FROM tb_usuarios where login LIKE :SEARCH ORDER BY login", Array(
+            ':SEARCH'=>"%".$login."%"
+        ));
+    }
+
+
+
+    public function login($login, $senha){
+
+        $sql = new Sql();
+        $results = $sql->select("SELECT * FROM tb_usuarios WHERE login = :LOGIN AND senha = :SENHA", array(
+         ":LOGIN"=>$login,
+         ":SENHA"=>$senha  
+        ));
+        if(count($results) > 0){
+        
+            $this->setData($results[0]);
+        } else{
+            throw new Exception("Login ou senha inválidos!");
+        }
+
+    }
+
+
+    public function setData($data){
+
+        $this->setIdUsuario($data["idUsuario"]);
+        $this->setLogin($data["login"]);
+        $this->setSenha($data["senha"]);
+        $this->setDtCadastro(new DateTime($data["dtCadastro"]));
+    }
+
+    public function insert(){
+        $sql = new Sql();
+
+        $results = $sql->select("CALL sp_usuarios_insert(:LOGIN, :SENHA)", array(
+        ':LOGIN'=>$this->getLogin(),
+        ':SENHA'=>$this->getSenha()    
+        ));
+
+        if(count($results) > 0){
+            $this->setData($results[0]);
+        }
+    }
+
+
+    public function update($login, $senha){
+
+        $this->setLogin($login);
+        $this->setSenha($senha);
+    
+        $sql = new Sql();
+        $sql->query("UPDATE tb_usuarios set login = :LOGIN, senha = :SENHA WHERE idUsuario = :ID", array(
+        ':LOGIN'=>$this->getLogin(),
+        ':SENHA'=>$this->getSenha(),
+        ':ID'=>$this->getIdUsuario()
+        ));
+
+    }
 
 }
-
 
 
 
